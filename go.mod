@@ -1,4 +1,4 @@
-module github.com/tofel/secret_sharing
+module github.com/tofel/shamir
 
 go 1.22.3
 
