@@ -1,4 +1,0 @@
-try using https://github.com/hashicorp/vault/blob/main/shamir/shamir.go for go
-and https://github.com/konidev20/pyshamir for Python (it's supposedly based on Hashicorp)
-
-See if they are interoperable
