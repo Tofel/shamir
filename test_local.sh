@@ -23,11 +23,11 @@ run_test() {
 
     # Python encode
     python_encoded=$(python3 shamir.py split "$secret" "$threshold" "$total_shares")
-    echo "Python Encoded: $python_encoded"
+    # echo "Python Encoded: $python_encoded"
 
     # Go decode Python encoded
     go_decoded=$(go run shamir.go restore "$python_encoded")
-    echo "Go Decoded: $go_decoded"
+    # echo "Go Decoded: $go_decoded"
 
     # Check if the Go decoded matches the original secret
     if [ "$go_decoded" != "$secret" ]; then
@@ -37,11 +37,11 @@ run_test() {
 
     # Go encode
     go_encoded=$(go run shamir.go split "$secret" "$threshold" "$total_shares")
-    echo "Go Encoded: $go_encoded"
+    # echo "Go Encoded: $go_encoded"
 
     # Python decode Go encoded
     python_decoded=$(python3 shamir.py restore "$go_encoded")
-    echo "Python Decoded: $python_decoded"
+    # echo "Python Decoded: $python_decoded"
 
     # Check if the Python decoded matches the original secret
     if [ "$python_decoded" != "$secret" ]; then
@@ -54,7 +54,7 @@ run_test() {
 
     # Iterate over the original array and construct inputs with various numbers of elements
     for (( n=1; n<=${#shares_array[@]}; n++ )); do
-        echo "Testing with $n/$threshold ordered shares"
+        echo -n "Testing with $n/$total_shares ordered shares with $threshold threshold..."
         test_array=()
         for (( i=0; i<$n; i++ )); do
             test_array+=("${shares_array[i]}")
@@ -67,14 +67,14 @@ run_test() {
             # Expect an error
             go_decoded=$(go run shamir.go restore "$shares_input" 2>&1)
             if [ "$go_decoded" = "$secret" ]; then
-                echo "Test failed: Expected error when decoding with Go with $n shares, but got success"
+                echo -ne "\rTesting with $n/$total_shares ordered shares with $threshold threshold... NOK! --> Expected error when decoding with Go with $n shares, but got success"
                 exit 1
             fi
         else
             # Expect success
             go_decoded=$(go run shamir.go restore "$shares_input")
             if [ "$go_decoded" != "$secret" ]; then
-                echo "Test failed: Go failed to decode Python encoded secret with $n shares"
+                echo -ne "\rTesting with $n/$total_shares ordered shares with $threshold threshold... NOK! --> Go failed to decode Python encoded secret with $n shares"
                 exit 1
             fi
         fi
@@ -84,19 +84,21 @@ run_test() {
             # Expect an error
             python_decoded=$(python3 shamir.py restore "$shares_input" 2>&1)
             if [ "$python_decoded" = "$secret" ]; then
-                echo "Test failed: Expected error when decoding with Python with $n shares, but got success"
+                echo -ne "\rTesting with $n/$total_shares ordered shares with $threshold threshold... NOK! --> Expected error when decoding with Python with $n shares, but got success"
                 exit 1
             fi
         else
             # Expect success
             python_decoded=$(python3 shamir.py restore "$shares_input")
             if [ "$python_decoded" != "$secret" ]; then
-                echo "Test failed: Python failed to decode Go encoded secret with $n shares"
+                echo -ne "\rTesting with $n/$total_shares ordered shares with $threshold threshold... NOK! --> Python failed to decode Go encoded secret with $n shares"
                 exit 1
             fi
         fi
 
-        echo "Testing with $n/$threshold shuffled shares"
+        echo -ne "\rTesting with $n/$total_shares ordered shares with $threshold threshold... OK!" 
+        echo
+        echo -n "Testing with $n/$total_shares shuffled shares with $threshold threshold..."
         array=("${test_array[@]}")
         shuffle
 
@@ -107,16 +109,18 @@ run_test() {
             # Expect an error
             go_decoded=$(go run shamir.go restore "$shares_input" 2>&1)
             if [ "$go_decoded" = "$secret" ]; then
-                echo "Test failed: Expected error when decoding with Go with $n shares, but got success"
+                echo -ne "\rTesting with $n/$total_shares shuffled shares with $threshold threshold... NOK! --> Expected error when decoding with Go with $n shares, but got success"
                 exit 1
             fi
         else
             # Expect success
             go_decoded=$(go run shamir.go restore "$shares_input")
             if [ "$go_decoded" != "$secret" ]; then
-                echo "Test failed: Go failed to decode Python encoded secret with $n shares"
+                echo -ne "\rTesting with $n/$total_shares shuffled shares with $threshold threshold... NOK! --> Go failed to decode Python encoded secret with $n shares"
                 exit 1
             fi
+            # echo
+            # echo "secret decoded with Go from shuffled shares: $go_decoded"
         fi
 
         # Repeat the process for Go encoded shares
@@ -124,19 +128,22 @@ run_test() {
             # Expect an error
             python_decoded=$(python3 shamir.py restore "$shares_input" 2>&1)
             if [ "$python_decoded" = "$secret" ]; then
-                echo "Test failed: Expected error when decoding with Python with $n shares, but got success"
+                echo -ne "\rTesting with $n/$total_shares shuffled shares with $threshold threshold... NOK! --> Expected error when decoding with Python with $n shares, but got success"
                 exit 1
             fi
         else
             # Expect success
             python_decoded=$(python3 shamir.py restore "$shares_input")
             if [ "$python_decoded" != "$secret" ]; then
-                echo "Test failed: Python failed to decode Go encoded secret with $n shares"
+                echo -ne "\rTesting with $n/$total_shares shuffled shares with $threshold threshold... NOK! --> Python failed to decode Go encoded secret with $n shares"
                 exit 1
             fi
+            # echo "secret decoded with Python from shuffled shares: $python_decoded"
         fi        
 
-        echo "Tests passed for $n shares"
+        echo -ne "\rTesting with $n/$total_shares shuffled shares with $threshold threshold... OK!" 
+        echo
+        echo "Tests passed for $n/$total_shares shares"
         echo "----------------------------------------"
     done
 
@@ -158,8 +165,9 @@ declare -a thresholds=("2 2" "2 3" "3 5" "2 7" "7 7")
 
 # Iterate through test cases and thresholds
 for secret in "${secrets[@]}"; do
-    for threshold in "${thresholds[@]}"; do
-        echo "Testing secret: '$secret' with threshold: $threshold"
+    for threshold in "${thresholds[@]}"; do 
+        echo "-----> Testing secret: '$secret' with threshold: $threshold"
+        echo
         run_test "$secret" $threshold
         result=$(echo $?)
         if [ "$result" != "0" ]; then

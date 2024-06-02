@@ -1,4 +1,8 @@
 # Define the default target
+.PHONY: test
+test: test-unit test-local build-test-docker
+
+# Run unit tests
 .PHONY: test-unit
 test_uni: test-go test-python clean
 
@@ -27,14 +31,17 @@ clean:
 .PHONY: help
 help:
 	@echo "Usage:"
-	@echo "  make          Run all tests (Go and Python)"
-	@echo "  make test     Run all tests (Go and Python)"
-	@echo "  make test-go  Run only Go tests"
-	@echo "  make test-python Run only Python tests"
-	@echo "  make build          Build both Docker images"
-	@echo "  make build-go       Build Go Docker image"
-	@echo "  make build-python   Build Python Docker image"	
-	@echo "  make clean    Clean up generated files"
+	@echo "  make          		 		Run all tests (unit, local and docker)"
+	@echo "  make test     		 		Run all tests (unit, local and docker)"
+	@echo "  make test-go  		 		Run only Go unit tests"
+	@echo "  make test-python 	 		Run only Python unit tests"
+	@echo "  make test-local 	 		Run local interoperability tests"
+	@echo "  make test-docker 	 		Run docker interoperability tests"
+	@echo "  make build          		Build both Docker images"
+	@echo "  make build-go       		Build Go Docker image"
+	@echo "  make build-python  	  	Build Python Docker image"	
+	@echo "  make build-test-docker   	Build Docker images and run Docker tests"	
+	@echo "  make clean    		 		Clean up generated files"
 
 # Build both Docker images
 .PHONY: build
@@ -66,7 +73,3 @@ test-docker:
 
 .PHONY: build-test-docker
 build-test-docker: build test-docker
-
-.PHONY: test
-test: test-unit test-local build-test-docker
-
