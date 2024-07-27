@@ -17,13 +17,19 @@ Shamir's Secret Sharing works by splitting a secret into multiple parts (shares)
 
 ## Installation
 
-This repository includes a `vendor` folder with all necessary dependencies, managed using a Python virtual environment (`venv`). 
+This repository includes a `virtualenv` folder with all necessary dependencies, managed using a Python virtual environment (`venv`). Although it won't work out-of-the box, since all paths are relative to machine, on which it was created. It's included here just as a backup of dependencies.
 
-To set up the environment, run:
+To use it, run:
+```sh
+source virtualenv/bin/activate
+```
+
+It's recommended to setup a new environment on new machine:
 
 ```sh
-python3 -m venv vendor
-source vendor/bin/activate  # On Windows use `vendor\Scripts\activate`
+rm -rf virtualenv
+python3 -m venv virtualenv
+source virtualenv/bin/activate  # On Windows use `virtualenv\Scripts\activate`
 pip3 install -r requirements.txt
 ```
 
@@ -152,11 +158,11 @@ This project is licensed under the MIT License.
 
 # Shamir's Secret Sharing w Pythonie
 
-To jest prosty program w języku Python, który demonstruje metodę Shamir's Secret Sharing, algorytm kryptograficzny używany do podziału sekretu na wiele części, z których tylko pewna liczba jest potrzebna do odtworzenia oryginalnego sekretu. Może to być użyteczne do bezpiecznego przechowywania wrażliwych informacji.
+To prosty program w Pythonie, który demonstruje działanie algorytmu Shamir's Secret Sharing, służącego do dzielenia sekretu na wiele części, z których tylko określona liczba jest potrzebna do odtworzenia oryginalnego sekretu. Może to być przydatne do bezpiecznego przechowywania wrażliwych informacji.
 
 ## Jak to działa
 
-Shamir's Secret Sharing działa poprzez podział sekretu na wiele części (udziałów). Potrzebujesz pewnej liczby tych udziałów (próg), aby odtworzyć oryginalny sekret. Jeśli masz mniej niż wymaganą liczbę udziałów, nie możesz odtworzyć sekretu.
+Algorytm Shamir's Secret Sharing dzieli sekret na wiele części (udziałów). Aby odtworzyć oryginalny sekret, potrzebujesz określonej liczby tych udziałów (próg). Jeśli masz mniej udziałów niż wynosi próg, nie możesz odtworzyć sekretu.
 
 ### Funkcje
 
@@ -169,40 +175,46 @@ Shamir's Secret Sharing działa poprzez podział sekretu na wiele części (udzi
 
 ## Instalacja
 
-To repozytorium zawiera folder `vendor` ze wszystkimi niezbędnymi zależnościami, zarządzanymi przy użyciu wirtualnego środowiska Pythona (`venv`). 
+To repozytorium zawiera folder `virtualenv` ze wszystkimi niezbędnymi zależnościami, zarządzanymi przy użyciu wirtualnego środowiska Pythona (`venv`). Chociaż nie zadziała od razu, ponieważ wszystkie ścieżki są względne względem maszyny, na której został utworzony, jest dołączony jako kopia zapasowa zależności.
 
-Aby skonfigurować środowisko, uruchom:
+Aby go użyć, uruchom:
+```sh
+source virtualenv/bin/activate
+```
+
+Zaleca się utworzenie nowego środowiska na nowej maszynie:
 
 ```sh
-python3 -m venv vendor
-source vendor/bin/activate  # Na Windows użyj `vendor\Scripts\activate`
-pip install -r requirements.txt
+rm -rf virtualenv
+python3 -m venv virtualenv
+source virtualenv/bin/activate  # W systemie Windows użyj `virtualenv\Scripts\activate`
+pip3 install -r requirements.txt
 ```
 
 ## Użycie
 
 ### Podział sekretu
 
-Aby podzielić sekret, użyj komendy `split` wraz z sekretem, liczbą udziałów potrzebnych do odtworzenia sekretu oraz całkowitą liczbą udziałów, które chcesz stworzyć.
+Aby podzielić sekret, użyj polecenia `split` z następującymi argumentami: sekret, liczba udziałów potrzebnych do odtworzenia sekretu (próg) oraz całkowita liczba udziałów.
 
 ```sh
-python3 shamir.py split <sekret> <próg> <całkowita_liczba_udziałów>
+python3 shamir.py split <secret> <threshold> <total_shares>
 ```
 
 **Przykład:**
 
 ```sh
-python3 shamir.py split "mójsekret" 3 5
+python3 shamir.py split "mojsektet" 3 5
 ```
 
-To podzieli sekret "mójsekret" na 5 udziałów, z czego dowolne 3 są potrzebne do odtworzenia sekretu.
+To polecenie podzieli sekret "mojsektet" na 5 udziałów, z których dowolne 3 są potrzebne do odtworzenia sekretu.
 
 ### Odtworzenie sekretu
 
-Aby odtworzyć sekret, użyj komendy `restore` wraz z zakodowanymi udziałami (ciąg rozdzielony przecinkami).
+Aby odtworzyć sekret, użyj polecenia `restore` z zakodowanymi udziałami (ciąg oddzielony przecinkami).
 
 ```sh
-python3 shamir.py restore <zakodowane_udzialy>
+python3 shamir.py restore <encoded_shares>
 ```
 
 **Przykład:**
@@ -211,14 +223,14 @@ python3 shamir.py restore <zakodowane_udzialy>
 python3 shamir.py restore "1-3b6a27bcce3b6d4a3e48c6b8303f3f4c4e1a3b8bcd89,2-4e1a3b8bcd89123b6a27bcce3b6d4a3e48c6b8303f3f4c4e"
 ```
 
-To odtworzy oryginalny sekret z dostarczonych udziałów.
+To polecenie odtworzy oryginalny sekret z dostarczonych udziałów.
 
-## Przykładowy przebieg
+## Przykładowy Przebieg
 
 1. **Podział sekretu:**
 
     ```sh
-    python3 shamir.py split "mójsekret" 3 5
+    python3 shamir.py split "mojsektet" 3 5
     ```
 
     Wynik:
@@ -229,7 +241,7 @@ To odtworzy oryginalny sekret z dostarczonych udziałów.
 
 2. **Odtworzenie sekretu:**
 
-    Użyj co najmniej 3 zakodowanych udziałów z kroku podziału.
+    Użyj co najmniej 3 z zakodowanych udziałów z kroku podziału.
 
     ```sh
     python3 shamir.py restore "1-4b6a27bcce,2-3e48c6b830,3-3f3f4c4e1a"
@@ -238,12 +250,12 @@ To odtworzy oryginalny sekret z dostarczonych udziałów.
     Wynik:
 
     ```sh
-    mójsekret
+    mojsektet
     ```
 
-## Używanie obrazu Docker
+## Użycie obrazu Docker
 
-Możesz również użyć dostarczonego obrazu Docker, aby uruchomić program Shamir's Secret Sharing bez konieczności konfigurowania środowiska Python na swoim lokalnym komputerze. Polecenie build utworzy obraz zgodny z architekturą maszyny, na której jest uruchamiane. Oto jak to zrobić:
+Możesz również użyć dostarczonego obrazu Docker, aby uruchomić program Shamir's Secret Sharing bez konieczności konfiguracji środowiska Pythona na swoim lokalnym komputerze. Polecenie build stworzy obraz zgodny z architekturą maszyny, na której jest uruchomione. Oto jak to zrobić:
 
 1. **Budowanie obrazu Docker:**
 
@@ -256,19 +268,19 @@ Możesz również użyć dostarczonego obrazu Docker, aby uruchomić program Sha
     Aby podzielić sekret:
 
     ```sh
-    docker run --rm shamir-python:latest split <sekret> <próg> <całkowita_liczba_udziałów>
+    docker run --rm shamir-python:latest split <secret> <threshold> <total_shares>
     ```
 
     Przykład:
 
     ```sh
-    docker run --rm shamir-python:latest split "mójsekret" 3 5
+    docker run --rm shamir-python:latest split "mojsektet" 3 5
     ```
 
     Aby odtworzyć sekret:
 
     ```sh
-    docker run --rm shamir-python:latest restore <zakodowane_udzialy>
+    docker run --rm shamir-python:latest restore <encoded_shares>
     ```
 
     Przykład:
@@ -279,25 +291,25 @@ Możesz również użyć dostarczonego obrazu Docker, aby uruchomić program Sha
 
 ### Ładowanie obrazów Docker z dysku
 
-Jeśli masz obraz Docker zapisany na dysku, możesz załadować go do Docker przy użyciu następującego polecenia:
+Jeśli masz obraz Docker zapisany na dysku, możesz go załadować do Dockera, używając następującego polecenia:
 
 ```sh
-docker load -i sciezka/do/twojego/obrazu.tar
+docker load -i path/to/your/image.tar
 ```
 
-Zastąp `sciezka/do/twojego/obrazu.tar` faktyczną ścieżką do pliku obrazu Docker.
+Zastąp `path/to/your/image.tar` rzeczywistą ścieżką do pliku obrazu Docker.
 
 ## Uwagi
 
-- Komenda `split` wymaga podania sekretną frazę, progu oraz całkowitej liczby udziałów.
-- Komenda `restore` wymaga zakodowanych udziałów w określonym formacie.
+- Polecenie `split` wymaga podania ciągu znaków (sekretu), progu oraz całkowitej liczby udziałów.
+- Polecenie `restore` wymaga podania zakodowanych udziałów w określonym formacie.
 - Upewnij się, że próg jest mniejszy lub równy całkowitej liczbie udziałów.
-- Upewnij się, że masz zainstalowaną wersję Python 3.12.0 lub wyższą i że aktywowałeś wirtualne środowisko przy użyciu dostarczonych instrukcji `venv`.
+- Upewnij się, że masz zainstalowany Python w wersji 3.12.0 lub wyższej i aktywowałeś wirtualne środowisko za pomocą podanych instrukcji `venv`.
 
 ## Obsługa błędów
 
-Program zawiera podstawową obsługę błędów dla nieprawidłowych danych wejściowych i niepoprawnego użycia. Upewnij się, że przestrzegasz poprawnego formatu komend, aby uniknąć błędów.
+Program zawiera podstawową obsługę błędów dla nieprawidłowych danych wejściowych i niewłaściwego użycia. Upewnij się, że stosujesz się do poprawnego formatu poleceń, aby uniknąć błędów.
 
 ## Licencja
 
-Ten projekt jest licencjonowany na podstawie licencji MIT.
+Ten projekt jest licencjonowany na warunkach licencji MIT.

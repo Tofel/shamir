@@ -7,7 +7,7 @@ run_test() {
     total_shares="$3"
 
     # Python encode
-    python_encoded=$(docker run --rm shamir-python:latest split "$secret" $threshold $total_shares)
+    python_encoded=$(docker run --rm shamir-python:latest-arm64 split "$secret" $threshold $total_shares)
     echo "Python Encoded: $python_encoded"
 
     # Go decode Python encoded
@@ -27,7 +27,7 @@ run_test() {
     echo "Go Encoded: $go_encoded"
 
     # Python decode Go encoded
-    python_decoded=$(docker run --rm shamir-python:latest restore $go_encoded)
+    python_decoded=$(docker run --rm shamir-python:latest-arm64 restore $go_encoded)
     python_decoded=$(echo $python_decoded | sed 's/^"//;s/"$//')
     echo "Python Decoded: $python_decoded"
 

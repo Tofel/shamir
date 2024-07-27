@@ -58,8 +58,10 @@ build-go:
 # Build only Python Docker image
 .PHONY: build-python
 build-python:
-	@echo "Building Python Docker image..."
-	@docker build -t shamir-python:latest -f Dockerfile-python . || { echo "Python Docker build failed!"; exit 1; }
+	@echo "Building Python Docker image for linux/amd64 and linux/arm64..."
+	@docker buildx create --use
+	@docker buildx build --platform linux/amd64 -t shamir-python:latest-amd64 -f Dockerfile-python . --load || { echo "Python Docker build failed!"; exit 1; }
+	@docker buildx build --platform linux/arm64 -t shamir-python:latest-arm64 -f Dockerfile-python . --load || { echo "Python Docker build failed!"; exit 1; }
 
 .PHONY: test-local
 test-local:

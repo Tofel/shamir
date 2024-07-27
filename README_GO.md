@@ -115,7 +115,7 @@ You can also use the provided Docker image to run the Shamir's Secret Sharing pr
 1. **Building the Docker Image:**
 
     ```sh
-    docker build -t shamir:latest .
+    docker build -t shamir-go:latest .
     ```
 
 2. **Running the Docker Container:**
@@ -123,25 +123,25 @@ You can also use the provided Docker image to run the Shamir's Secret Sharing pr
     To split a secret:
 
     ```sh
-    docker run --rm shamir:latest split <secret> <threshold> <total_shares>
+    docker run --rm shamir-go:latest split <secret> <threshold> <total_shares>
     ```
 
     Example:
 
     ```sh
-    docker run --rm shamir:latest split "mysecret" 3 5
+    docker run --rm shamir-go:latest split "mysecret" 3 5
     ```
 
     To restore a secret:
 
     ```sh
-    docker run --rm shamir:latest restore <encoded_shares>
+    docker run --rm shamir-go:latest restore <encoded_shares>
     ```
 
     Example:
 
     ```sh
-    docker run --rm shamir:latest restore "1-3b6a27bcce3b6d4a3e48c6b8303f3f4c4e1a3b8bcd89,2-4e1a3b8bcd89123b6a27bcce3b6d4a3e48c6b8303f3f4c4e"
+    docker run --rm shamir-go:latest restore "1-3b6a27bcce3b6d4a3e48c6b8303f3f4c4e1a3b8bcd89,2-4e1a3b8bcd89123b6a27bcce3b6d4a3e48c6b8303f3f4c4e"
     ```
 
 ### Loading Docker Images from Disk
@@ -286,7 +286,7 @@ Możesz również użyć dostarczonego obrazu Docker, aby uruchomić program Sha
 1. **Budowanie obrazu Docker:**
 
     ```sh
-    docker build -t shamir:latest .
+    docker build -t shamir-go:latest .
     ```
 
 2. **Uruchamianie kontenera Docker:**
@@ -294,25 +294,25 @@ Możesz również użyć dostarczonego obrazu Docker, aby uruchomić program Sha
     Aby podzielić sekret:
 
     ```sh
-    docker run --rm shamir:latest split <sekret> <próg> <całkowita_liczba_udziałów>
+    docker run --rm shamir-go:latest split <sekret> <próg> <całkowita_liczba_udziałów>
     ```
 
     Przykład:
 
     ```sh
-    docker run --rm shamir:latest split "mójsekret" 3 5
+    docker run --rm shamir-go:latest split "mójsekret" 3 5
     ```
 
     Aby odtworzyć sekret:
 
     ```sh
-    docker run --rm shamir:latest restore <zakodowane_udzialy>
+    docker run --rm shamir-go:latest restore <zakodowane_udzialy>
     ```
 
     Przykład:
 
     ```sh
-    docker run --rm shamir:latest restore "1-3b6a27bcce3b6d4a3e48c6b8303f3f4c4e1a3b8bcd89,2-4e1a3b8bcd89123b6a27bcce3b6d4a3e48c6b8303f3f4c4e"
+    docker run --rm shamir-go:latest restore "1-3b6a27bcce3b6d4a3e48c6b8303f3f4c4e1a3b8bcd89,2-4e1a3b8bcd89123b6a27bcce3b6d4a3e48c6b8303f3f4c4e"
     ```
 
 ### Ładowanie obrazów Docker z dysku
