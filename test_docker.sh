@@ -6,12 +6,23 @@ run_test() {
     threshold="$2"
     total_shares="$3"
 
+    ARCH=$(uname -m)
+
+    if [ "$ARCH" == "x86_64" ]; then
+        suffix="amd64"
+    elif [ "$ARCH" == "aarch64" ] || [ "$ARCH" == "arm64" ]; then
+        suffix="arm64"
+    else
+        echo "Unknown architecture: $ARCH. Will try using amd64"
+        suffix="amd64"
+    fi
+
     # Python encode
-    python_encoded=$(docker run --rm shamir-python:latest-arm64 split "$secret" $threshold $total_shares)
+    python_encoded=$(docker run --rm shamir-python:latest-$suffix split "$secret" $threshold $total_shares)
     echo "Python Encoded: $python_encoded"
 
     # Go decode Python encoded
-    go_decoded=$(docker run --rm shamir-go:latest-arm64 restore $python_encoded)
+    go_decoded=$(docker run --rm shamir-go:latest-$suffix restore $python_encoded)
     go_decoded=$(echo $go_decoded | sed 's/^"//;s/"$//')
     echo "Go Decoded: $go_decoded"
 
@@ -23,11 +34,11 @@ run_test() {
     fi
 
     # Go encode
-    go_encoded=$(docker run --rm shamir-go:latest-arm64 split "$secret" $threshold $total_shares)
+    go_encoded=$(docker run --rm shamir-go:latest-$suffix split "$secret" $threshold $total_shares)
     echo "Go Encoded: $go_encoded"
 
     # Python decode Go encoded
-    python_decoded=$(docker run --rm shamir-python:latest-arm64 restore $go_encoded)
+    python_decoded=$(docker run --rm shamir-python:latest-$suffix restore $go_encoded)
     python_decoded=$(echo $python_decoded | sed 's/^"//;s/"$//')
     echo "Python Decoded: $python_decoded"
 
