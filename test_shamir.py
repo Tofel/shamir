@@ -1,17 +1,15 @@
 import unittest
 import random
-import pyshamir
+import importlib.util
+from pathlib import Path
 
-def split_secret(secret, total_shares, threshold):
-    shares = pyshamir.split(bytes(secret, 'utf-8'), int(total_shares), int(threshold))
-    encoded_shares = [f"{i+1}-{share.hex()}" for i, share in enumerate(shares)]
-    return ','.join(encoded_shares)
+MODULE_PATH = Path(__file__).with_name("shamir.py")
+SPEC = importlib.util.spec_from_file_location("shamir_cli", MODULE_PATH)
+shamir_module = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(shamir_module)
 
-def restore_secret(shares):
-    shares_list = shares.split(',')
-    decoded_shares = [bytes.fromhex(share.split('-')[1]) for share in shares_list]
-    secret = pyshamir.combine(decoded_shares)
-    return secret.decode('utf-8')
+restore_secret = shamir_module.restore_secret
+split_secret = shamir_module.split_secret
 
 def shuffle_shares(encoded_shares):
     shares = encoded_shares.split(',')
@@ -95,10 +93,10 @@ class TestShamir(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     restore_secret(extra_shares)
 
-                with self.assertRaises(IndexError):
+                with self.assertRaises(ValueError):
                     restore_secret("1624ghjsgd762")
 
-                with self.assertRaises(IndexError):
+                with self.assertRaises(ValueError):
                     restore_secret(remove_indexes_from_shares(encoded_shares))
 
     def test_incorrect_split(self):

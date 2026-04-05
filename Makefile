@@ -4,7 +4,7 @@ test: test-unit test-local build-test-docker
 
 # Run unit tests
 .PHONY: test-unit
-test_uni: test-go test-python clean
+test_unit: test-go test-python clean
 
 # Run Go tests
 .PHONY: test-go
