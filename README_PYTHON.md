@@ -35,6 +35,39 @@ pip3 install -r requirements.txt
 
 ## Usage
 
+### Operational Security Note
+
+Passing secrets or shares as command-line arguments is convenient, but those values may be exposed through:
+
+- shell history
+- local process listings
+- terminal scrollback or logs
+- Docker runtime metadata while a container is running
+
+If you are working with sensitive material, prefer running the local Python script on an airgapped machine and temporarily disable Bash history for the session:
+
+```sh
+unset HISTFILE
+set +o history
+```
+
+After you are done, you can re-enable history:
+
+```sh
+set -o history
+```
+
+If your recovery workflow is wallet-focused, one pragmatic way to reduce risk is to treat the recovered wallet as short-lived:
+
+1. Recover the seed on an airgapped machine.
+2. Verify that it matches the expected wallet.
+3. Move funds to a fresh wallet as soon as practical.
+4. Stop relying on the recovered seed after the transfer is complete.
+
+This does not prevent local exposure during the recovery session, but it can reduce the value of any leaked secret by limiting how long the restored wallet remains in active use.
+
+This strategy also does not protect against restoring the wrong secret. If shares are corrupted or insufficient, the software may still reconstruct incorrect output. For wallet recovery, you should verify that the restored wallet matches your expected accounts before moving funds.
+
 ### Splitting a Secret
 
 To split a secret, use the `split` command followed by the secret, the threshold number of shares needed to reconstruct the secret, and the total number of shares you want to create.
@@ -47,6 +80,15 @@ python3 shamir.py split <secret> <threshold> <total_shares>
 
 ```sh
 python3 shamir.py split "mysecret" 3 5
+```
+
+Safer Bash session example:
+
+```sh
+unset HISTFILE
+set +o history
+python3 shamir.py split "mysecret" 3 5
+set -o history
 ```
 
 This will split the secret "mysecret" into 5 shares, where any 3 shares are needed to restore the secret.
@@ -63,6 +105,15 @@ python3 shamir.py restore <encoded_shares>
 
 ```sh
 python3 shamir.py restore "1-3b6a27bcce3b6d4a3e48c6b8303f3f4c4e1a3b8bcd89,2-4e1a3b8bcd89123b6a27bcce3b6d4a3e48c6b8303f3f4c4e"
+```
+
+Safer Bash session example:
+
+```sh
+unset HISTFILE
+set +o history
+python3 shamir.py restore "1-3b6a27bcce3b6d4a3e48c6b8303f3f4c4e1a3b8bcd89,2-4e1a3b8bcd89123b6a27bcce3b6d4a3e48c6b8303f3f4c4e"
+set -o history
 ```
 
 This will reconstruct the original secret from the provided shares.
@@ -110,26 +161,40 @@ You can also use the provided Docker image to run the Shamir's Secret Sharing pr
     To split a secret:
 
     ```sh
-    docker run --rm shamir-python:latest split <secret> <threshold> <total_shares>
+    docker run --rm --network none shamir-python:latest split <secret> <threshold> <total_shares>
     ```
 
     Example:
 
     ```sh
-    docker run --rm shamir-python:latest split "mysecret" 3 5
+    unset HISTFILE
+    set +o history
+    docker run --rm --network none shamir-python:latest split "mysecret" 3 5
+    set -o history
     ```
 
     To restore a secret:
 
     ```sh
-    docker run --rm shamir-python:latest restore <encoded_shares>
+    docker run --rm --network none shamir-python:latest restore <encoded_shares>
     ```
 
     Example:
 
     ```sh
-    docker run --rm shamir-python:latest restore "1-3b6a27bcce3b6d4a3e48c6b8303f3f4c4e1a3b8bcd89,2-4e1a3b8bcd89123b6a27bcce3b6d4a3e48c6b8303f3f4c4e"
+    unset HISTFILE
+    set +o history
+    docker run --rm --network none shamir-python:latest restore "1-3b6a27bcce3b6d4a3e48c6b8303f3f4c4e1a3b8bcd89,2-4e1a3b8bcd89123b6a27bcce3b6d4a3e48c6b8303f3f4c4e"
+    set -o history
     ```
+
+Docker note:
+
+- `--rm` removes the container after it exits, reducing persistence of runtime metadata.
+- `--network none` prevents accidental network access during sensitive operations.
+- Even with these flags, secrets passed as arguments may still be visible locally while the container is running.
+- For the lowest exposure, prefer the local Python script over `docker run` when handling real secrets.
+- If you recover a wallet in Docker anyway, treat that wallet as temporary and sweep funds to a fresh wallet after verification.
 
 ### Loading Docker Images from Disk
 
@@ -147,6 +212,8 @@ Replace `path/to/your/image.tar` with the actual path to your Docker image file.
 - The `restore` command requires the encoded shares in a specific format.
 - Make sure the threshold is less than or equal to the total number of shares.
 - Ensure you have Python 3.12.0 or higher installed and have activated the virtual environment using the provided `venv` setup instructions.
+- If you pass secrets or shares as command-line arguments, disable Bash history first if you do not want them recorded locally.
+- For wallet recovery, verify that the restored wallet is the expected one before sending funds, then move funds to a fresh wallet if you want to minimize the impact of local exposure during recovery.
 
 ## Error Handling
 
