@@ -50,18 +50,32 @@ build: build-go build-python
 # Build only Go Docker image for multiple platforms
 .PHONY: build-go
 build-go:
-	@echo "Building Go Docker image for linux/amd64 and linux/arm64..."
-	@docker buildx create --use
-	@docker buildx build --platform linux/amd64 -t shamir-go:latest-amd64 -f Dockerfile-go . --load || { echo "Go Docker build failed!"; exit 1; }
-	@docker buildx build --platform linux/arm64 -t shamir-go:latest-arm64 -f Dockerfile-go . --load || { echo "Go Docker build failed!"; exit 1; }
+	@echo "Building multiarch Go Docker image..."
+	@docker buildx inspect multiarch >/dev/null 2>&1 \
+  	&& docker buildx use multiarch \
+  	|| docker buildx create --name multiarch --driver docker-container --use
+	@docker buildx inspect --bootstrap
+
+	@docker buildx build \
+	--platform linux/amd64,linux/arm64 \
+	-t shamir-go:latest \
+	-f Dockerfile-go \
+	--load .	
 
 # Build only Python Docker image
 .PHONY: build-python
 build-python:
-	@echo "Building Python Docker image for linux/amd64 and linux/arm64..."
-	@docker buildx create --use
-	@docker buildx build --platform linux/amd64 -t shamir-python:latest-amd64 -f Dockerfile-python . --load || { echo "Python Docker build failed!"; exit 1; }
-	@docker buildx build --platform linux/arm64 -t shamir-python:latest-arm64 -f Dockerfile-python . --load || { echo "Python Docker build failed!"; exit 1; }
+	@echo "Building multiarch Python Docker image..."
+	@docker buildx inspect multiarch >/dev/null 2>&1 \
+  	&& docker buildx use multiarch \
+  	|| docker buildx create --name multiarch --driver docker-container --use
+	@docker buildx inspect --bootstrap
+
+	@docker buildx build \
+	--platform linux/amd64,linux/arm64 \
+	-t shamir-python:latest \
+	-f Dockerfile-python \
+	--load .		
 
 .PHONY: test-local
 test-local:

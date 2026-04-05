@@ -1,10 +1,10 @@
 module github.com/tofel/shamir
 
-go 1.22.3
+go 1.26.1
 
 require (
-	github.com/hashicorp/vault v1.16.2
-	github.com/stretchr/testify v1.9.0
+	github.com/hashicorp/vault v1.21.4
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
